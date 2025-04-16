@@ -33,6 +33,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
+RUN php artisan storage:link
+
 # Expose port 80
 EXPOSE 80
 

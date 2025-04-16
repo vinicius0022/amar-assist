@@ -1,0 +1,26 @@
+# Ignore node/npm stuff (if present)
+node_modules
+npm-debug.log
+
+# Ignore Composer dependencies (they'll be installed in the container)
+vendor
+
+# Ignore storage logs and cache
+storage/*.key
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+public/storage
+
+# Ignore the symbolic link to storage (causes build issues)
+public/storage
+
+# Git
+.git
+.gitignore
+
+# Docker files from host
+Dockerfile
+.dockerignore
+docker-compose.yml

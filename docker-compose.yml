@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: products-api-app
+    volumes:
+      - ./products-api:/var/www/html
     ports:
       - "8001:80"
     depends_on:

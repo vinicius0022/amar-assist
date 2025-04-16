@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,6 +22,4 @@ Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
 });
 
-Route::get('/products', function () {
-    return response()->json(['products' => ['Product 1', 'Product 2', 'Product 3']]);
-});
+Route::apiResource('products', ProductController::class);

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 
@@ -55,28 +55,28 @@ function toggle() {
   isRegister.value = !isRegister.value
   error.value = null
 }
+
 </script>
 
 <template>
   <div class="auth-container">
-    <h2>{{ isRegister ? 'Register' : 'Login' }}</h2>
+    <h2>{{ isRegister ? 'Cadastrar' : 'Login' }}</h2>
 
     <form @submit.prevent="submit">
-      <!-- Campo Nome (apenas no registro) -->
       <div v-if="isRegister">
         <input v-model="name" placeholder="Name" required />
       </div>
       <input v-model="email" placeholder="Email" required />
       <input v-model="password" type="password" placeholder="Password" required />
-      <button>{{ isRegister ? 'Register' : 'Login' }}</button>
+      <button>{{ isRegister ? 'Cadastrar' : 'Login' }}</button>
     </form>
 
     <p v-if="error" class="error">{{ error }}</p>
 
     <p class="switch">
-      <span v-if="!isRegister">Don't have an account?</span>
-      <span v-else>Already have an account?</span>
-      <button @click="toggle">{{ isRegister ? 'Login' : 'Register' }}</button>
+      <span v-if="!isRegister">Não possui uma conta?</span>
+      <span v-else>Já possui uma conta?</span>
+      <button @click="toggle">{{ isRegister ? 'Login' : 'Cadastrar' }}</button>
     </p>
 
     <LoadingOverlay v-if="isLoading"/>

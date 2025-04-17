@@ -5,12 +5,13 @@ import LoadingOverlay from './LoadingOverlay.vue'
 
 const props = defineProps(['product', 'newProduct'])
 
-const emits = defineEmits(['close-modal'])
+const emits = defineEmits(['close-modal', 'product-created'])
 
-const { update, error, create } = useApi('api/products')
+const { update, error, create, data } = useApi('api/products')
 
 const defaultNoImage = `http://localhost:8000/images/no-image.jpg`
 const selectedFiles = ref([])
+const deletedImages = ref([])
 const currentIndex = ref(0)
 const fileInput = ref(null)
 const isLoading = ref(false)
@@ -18,17 +19,38 @@ const isLoading = ref(false)
 // Method to handle file selection
 const onFileChange = (event) => {
     selectedFiles.value = Array.from(event.target.files)
-    Object.assign(props.product, {images:selectedFiles.value})
-};
 
-// Method to trigger the hidden file input
+    const files = Array.from(event.target.files)
+
+    for (const file of files) {
+        const reader = new FileReader()
+        reader.onload = () => {
+            localImages.value.push({
+                file,
+                path: reader.result,
+                preview: true
+            })
+        }
+        reader.readAsDataURL(file)
+    }
+    event.target.value = ''
+}
+
+const removeImage = (id) => {
+  deletedImages.value.push(id)
+
+  localImages.value = localImages.value.filter(img => img.id !== id);
+
+  Object.assign(props.product, { deletedImages: deletedImages.value })
+}
+
 const triggerFileInput = () => {
     fileInput.value.click();
 };
 
 
 function nextSlide() {
-  if (currentIndex.value < props.product.images.length - 1) {
+  if (currentIndex.value < localImages.value.length - 1) {
     currentIndex.value++
   }
 }
@@ -40,7 +62,7 @@ function prevSlide() {
 }
 
 async function submitUpdate () {
-    isLoading.value = true;
+    isLoading.value = true
 
     const formData = new FormData()
     formData.append('_method', 'PUT')
@@ -54,6 +76,10 @@ async function submitUpdate () {
         formData.append('images[]', file)
     })
 
+    deletedImages.value.forEach(file => {
+        formData.append('deleted_images[]', file)
+    })
+
     await update(props.product.id, formData).then(res => {
         if(error.value)
             alert(error.value.message)
@@ -61,28 +87,39 @@ async function submitUpdate () {
             Object.assign(props.product, res)
     })
 
-    isLoading.value = false;
+    isLoading.value = false
 }
 
 async function createProduct () {
+    isLoading.value = true
 
     const formData = new FormData()
-    formData.append('title', props.product.title)
-    formData.append('description', props.product.description)
-    formData.append('sale_price', props.product.sale_price)
-    formData.append('cost', props.product.cost)
-    formData.append('active', props.product.active)
+    if(props.product.title)
+        formData.append('title', props.product.title)
+
+    if(props.product.description)
+        formData.append('description', props.product.description)
+
+    if(props.product.sale_price)
+        formData.append('sale_price', props.product.sale_price)
+
+    if(props.product.cost)
+        formData.append('cost', props.product.cost)
+
+    formData.append('active', props.product.active ?? true)
 
     selectedFiles.value.forEach(file => {
         formData.append('images[]', file)
     })
 
-    await create(formData).then(res => {
-        if(error.value)
-            alert(error.value.message)
-        else
-            Object.assign(props.product, res)
+    await create(formData).then(() => {
+        if(!error.value) {
+            Object.assign(props.product, data.value)
+            emits('product-created', data.value)
+        }    
     })
+
+    isLoading.value = false
 }
 
 const title = computed({
@@ -120,6 +157,18 @@ const sale_price = computed({
     Object.assign(props.product, {sale_price: newValue})
   }
 })
+
+const active = computed({
+  get() {
+    return props.product?.active != undefined ? props.product.active : true
+  },
+  set() {
+    Object.assign(props.product, {active: !props.product.active})
+  }
+})
+
+const localImages = ref([...(props.product.images ? props.product.images : [])])
+
 </script>
 
 <template>
@@ -128,20 +177,31 @@ const sale_price = computed({
 
             <div class="div-product-card">
                 <div class="close-modal">
-                    <span @click="emits('close-modal')">X</span>
+                    <span @click="emits('close-modal')">✕</span>
                 </div>
 
                 <div class="carousel">
-                    <div class="carousel-window">
+                    <div class="carousel-window" :key="deletedImages.length" v-if="localImages.length > 0"> 
                         <div class="carousel-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-                            <div class="carousel-slide" v-for="(image, index) in product.images" :key="index">
-                                <img :src="`http://localhost:8000/${image?.path?.replace('public/', '')}` ?? defaultNoImage" :alt="'Image ' + (index + 1)" />
-                            </div>
-                        </div>
+                                <div class="carousel-slide" v-for="(image, index) in localImages" :key="image.id">
+                                    <img :src="image?.preview ? image?.path : `http://localhost:8000/${image?.path?.replace('public/', '')}` ?? defaultNoImage" :alt="'Image ' + (index + 1)" />
+                                    <button class="delete-button" v-if="currentIndex == index" @click="removeImage(image.id)">
+                                        ✕ 
+                                    </button>
+                                </div>
+                        </div>                      
+                    </div>
+
+                    <div class="carousel-window" v-else> 
+                        <div class="carousel-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
+                            <div class="carousel-slide">
+                                <img  :src="defaultNoImage"/>
+                            </div> 
+                        </div>                      
                     </div>
                     
-                    <button class="nav prev" @click="prevSlide" :disabled="!product.images || currentIndex === 0">‹</button>
-                    <button class="nav next" @click="nextSlide" :disabled="!product.images || currentIndex === product.images?.length - 1">›</button>
+                    <button v-if="localImages.length > 0" class="nav prev" @click="prevSlide" :disabled="!localImages || currentIndex === 0">‹</button>
+                    <button v-if="localImages.length > 0" class="nav next" @click="nextSlide" :disabled="!localImages || currentIndex === localImages?.length - 1">›</button>
                 </div>
 
                 <!-- Hidden input for file selection -->
@@ -156,7 +216,7 @@ const sale_price = computed({
 
                 <div class="div-btns">
                     <button @click="triggerFileInput">Acrescentar Imagens</button>
-                    <button class="btn-status" @click="Object.assign(props.product, {active: !props.product.active})">{{props.product.active ? 'Desativar' : 'Ativar'}}</button>
+                    <button class="btn-status" @click="Object.assign(props.product, {active: !active})">{{active ? 'Desativar' : 'Ativar'}}</button>
                 </div>
 
                 <div class="div-product-info">
@@ -339,6 +399,7 @@ const sale_price = computed({
     .carousel-slide {
         min-width: 100%;
         box-sizing: border-box;
+        position: relative;
     }
 
     .carousel-slide img {
@@ -373,6 +434,18 @@ const sale_price = computed({
     .nav:disabled {
         opacity: 0.5;
         cursor: default;
+    }
+
+    .delete-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        font-weight: bold;
+        cursor: pointer;
     }
 
 </style>

@@ -33,18 +33,39 @@ export default function useApi(resource) {
         }
     }
 
+
     const create = async (payload) => {
         loading.value = true
+        error.value = null
+        data.value = null
+
         try {
             const res = await fetch(baseUrl, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: payload,
             })
-            if (!res.ok) throw new Error('Failed to create')
-            data.value = await res.json()
+
+            const responseData = await res.json()
+            data.value = responseData
+
+            if (!res.ok) {
+                if (responseData.errors) {
+                    const allErrors = Object.values(responseData.errors)
+                        .flat()
+                        .join('\n')
+
+                    error.value = allErrors
+                    alert(allErrors)
+                } else {
+                    const message = responseData.message || 'Erro inesperado'
+                    error.value = message
+                    alert(message)
+                }
+            }
         } catch (err) {
-            error.value = err
+            error.value = 'Erro ao conectar com o servidor.'
+            alert(error.value)
         } finally {
             loading.value = false
         }

@@ -18,7 +18,7 @@ const { user } = useAuth()
 const router = useRouter()
 
 function ShowModal(product, isNew = false) {
-    showModal.value = !showModal.value
+    showModal.value = true
     productModal.value = product
 
     newProduct.value = false
@@ -40,6 +40,12 @@ async function logout() {
     router.push('/login')
 }
 
+function ProductCreated(product) {
+    products.value.push(product)
+    
+    console.log(products.value)
+}
+
 onMounted(async () => {
     await fetchAll()
     products.value = data.value
@@ -59,7 +65,7 @@ onMounted(async () => {
         </div>
 
         <div class="div-list">
-            <div class="div-product-card" :class="{inactive: !product.active}" v-for="(product, i) in products" :key="i" @click="ShowModal(product)">
+            <div class="div-product-card" :class="{inactive: !product.active}" v-for="(product, i) in products" :key="product.length" @click="ShowModal(product)">
                 <div class="div-img-container">
                     <img :src="`http://localhost:8000/${product.images[0]?.path.replace('public/', '')}` ?? defaultNoImage" @error="$event.target.src = defaultNoImage"/>
                 </div>
@@ -84,7 +90,7 @@ onMounted(async () => {
         </div>
 
         <div v-if="showModal">
-            <Product :product="productModal" @close-modal="showModal = !showModal" :newProduct="newProduct" />
+            <Product :product="productModal" @close-modal="showModal = !showModal" @product-created="ProductCreated($event)" :newProduct="newProduct" />
         </div>
 
         <LoadingOverlay v-if="loading"/>

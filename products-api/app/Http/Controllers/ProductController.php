@@ -38,6 +38,7 @@ class ProductController extends Controller
             'description' => $validated['description'],
             'sale_price' => $validated['sale_price'],
             'cost' => $validated['cost'],
+            'active' => 1,
         ]);
 
         // Handle images if available
@@ -91,7 +92,18 @@ class ProductController extends Controller
             'active' => $validated['active'],
         ]);
 
-        // Handle new images if available
+        // 🧽 Handle delete images
+        if ($request->has('deleted_images')) {
+            foreach ($request->input('deleted_images') as $imgId) {
+                $image = ProductImage::find($imgId);
+                if ($image && $image->product_id == $product->id) {
+                    Storage::delete('public/' . $image->path);
+                    $image->delete();
+                }
+            }
+        }
+
+        // Handle new images
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $i => $image) {
                 $imagePath = ProductImage::storeImage($image, $i);

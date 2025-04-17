@@ -25,8 +25,8 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'sale_price' => 'required|numeric|min:0',
-            'cost' => 'required|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0|max:999999.99',
+            'cost' => 'required|numeric|min:0|max:999999.99',
             'active' => 'required|boolean',
             'description' => [
                 'required',
@@ -53,8 +53,26 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'title.required' => 'O título do produto é obrigatório.',
+            'title.string' => 'O título do produto deve ser um texto.',
+            'title.max' => 'O título do produto não pode ter mais que 255 caracteres.',
+
+            'description.required' => 'A descrição do produto é obrigatória.',
+            'description.string' => 'A descrição do produto deve ser um texto.',
+
             'sale_price.required' => 'O preço de venda é obrigatório.',
+            'sale_price.numeric' => 'O preço de venda deve ser um número.',
+            'sale_price.min' => 'O preço de venda não pode ser negativo.',
+            'sale_price.max' => 'O preço de venda não pode ser maior que 999999.99.',
+
             'cost.required' => 'O custo é obrigatório.',
+            'cost.numeric' => 'O custo deve ser um número.',
+            'cost.min' => 'O custo não pode ser negativo.',
+            'cost.max' => 'O custo não pode ser maior que 999999.99.',
+
+            'active.required' => 'O campo ativo é obrigatório.',
+            'active.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
+
+            'images.*.image' => 'Cada arquivo deve ser uma imagem válida.',
             'images.*.mimes' => 'Só são permitidas imagens em jpg e png.',
             'images.*.max' => 'Cada imagem não pode ultrapassar 2MB.',
         ];

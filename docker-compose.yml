@@ -12,7 +12,7 @@ services:
     depends_on:
       - mysql
     environment:
-      APP_ENV: production
+      APP_ENV: development
       DB_HOST: mysql
       DB_PORT: 3306
       DB_DATABASE: laravel
@@ -61,20 +61,6 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-
-  vue-prod:
-    build:
-      context: .
-      dockerfile: docker/vue/Dockerfile.prod
-    container_name: products-api-frontend
-    ports:
-      - "8080:80"
-    environment:
-      - NODE_ENV=production
-    networks:
-      - app-network
-    depends_on:
-      - vue-dev
 
 volumes:
   mysql_data:

@@ -33,7 +33,7 @@ Verifique as portas no seu arquivo `docker-compose.yml` caso use outras.
 ### 1. Acessar o container
 
 ```bash
-docker exec -it laravel-app bash
+docker exec -it products-api-app bash
 ```
 
 ### 2. Instalar dependências

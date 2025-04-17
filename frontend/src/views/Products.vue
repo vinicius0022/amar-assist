@@ -42,8 +42,8 @@ async function Logout() {
 
 function ProductCreated(product) {
     products.value.push(product)
-    
-    console.log(products.value)
+    newProduct.value = false
+    productModal.value = products.value[products.value.length - 1]
 }
 
 onMounted(async () => {

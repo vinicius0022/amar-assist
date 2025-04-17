@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductImage;
+use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
@@ -15,6 +16,11 @@ class ProductSeeder extends Seeder
      */
     public function run()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('product_images')->truncate();
+        DB::table('products')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $product = Product::create([
             'title' => 'MacBook Pro 16"',
             'description' => 'O MacBook Pro de 16" é um notebook da Apple com design elegante e desempenho incrível para profissionais.',

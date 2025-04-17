@@ -16,7 +16,6 @@ const currentIndex = ref(0)
 const fileInput = ref(null)
 const isLoading = ref(false)
 
-// Method to handle file selection
 const onFileChange = (event) => {
     selectedFiles.value = Array.from(event.target.files)
 
@@ -36,7 +35,7 @@ const onFileChange = (event) => {
     event.target.value = ''
 }
 
-const removeImage = (id) => {
+const RemoveImage = (id) => {
   deletedImages.value.push(id)
 
   localImages.value = localImages.value.filter(img => img.id !== id);
@@ -44,24 +43,24 @@ const removeImage = (id) => {
   Object.assign(props.product, { deletedImages: deletedImages.value })
 }
 
-const triggerFileInput = () => {
+const TriggerFileInput = () => {
     fileInput.value.click();
 };
 
 
-function nextSlide() {
+function NextSlide() {
   if (currentIndex.value < localImages.value.length - 1) {
     currentIndex.value++
   }
 }
 
-function prevSlide() {
+function PrevSlide() {
   if (currentIndex.value > 0) {
     currentIndex.value--
   }
 }
 
-async function submitUpdate () {
+async function SubmitUpdate () {
     isLoading.value = true
 
     const formData = new FormData()
@@ -90,7 +89,7 @@ async function submitUpdate () {
     isLoading.value = false
 }
 
-async function createProduct () {
+async function CreateProduct () {
     isLoading.value = true
 
     const formData = new FormData()
@@ -185,7 +184,7 @@ const localImages = ref([...(props.product.images ? props.product.images : [])])
                         <div class="carousel-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
                                 <div class="carousel-slide" v-for="(image, index) in localImages" :key="image.id">
                                     <img :src="image?.preview ? image?.path : `http://localhost:8000/${image?.path?.replace('public/', '')}` ?? defaultNoImage" :alt="'Image ' + (index + 1)" />
-                                    <button class="delete-button" v-if="currentIndex == index" @click="removeImage(image.id)">
+                                    <button class="delete-button" v-if="currentIndex == index" @click="RemoveImage(image.id)">
                                         ✕ 
                                     </button>
                                 </div>
@@ -200,11 +199,10 @@ const localImages = ref([...(props.product.images ? props.product.images : [])])
                         </div>                      
                     </div>
                     
-                    <button v-if="localImages.length > 0" class="nav prev" @click="prevSlide" :disabled="!localImages || currentIndex === 0">‹</button>
-                    <button v-if="localImages.length > 0" class="nav next" @click="nextSlide" :disabled="!localImages || currentIndex === localImages?.length - 1">›</button>
+                    <button v-if="localImages.length > 0" class="nav prev" @click="PrevSlide" :disabled="!localImages || currentIndex === 0">‹</button>
+                    <button v-if="localImages.length > 0" class="nav next" @click="NextSlide" :disabled="!localImages || currentIndex === localImages?.length - 1">›</button>
                 </div>
 
-                <!-- Hidden input for file selection -->
                 <input
                     ref="fileInput"
                     type="file"
@@ -215,7 +213,7 @@ const localImages = ref([...(props.product.images ? props.product.images : [])])
                 />
 
                 <div class="div-btns">
-                    <button @click="triggerFileInput">Acrescentar Imagens</button>
+                    <button @click="TriggerFileInput">Acrescentar Imagens</button>
                     <button class="btn-status" @click="Object.assign(props.product, {active: !active})">{{active ? 'Desativar' : 'Ativar'}}</button>
                 </div>
 
@@ -238,8 +236,8 @@ const localImages = ref([...(props.product.images ? props.product.images : [])])
                     </div>
                 </div>
 
-                <button v-if="props.newProduct" class="btn-save-info" @click="createProduct()">Criar</button>
-                <button v-else class="btn-save-info" @click="submitUpdate()">Gravar</button>
+                <button v-if="props.newProduct" class="btn-save-info" @click="CreateProduct()">Criar</button>
+                <button v-else class="btn-save-info" @click="SubmitUpdate()">Gravar</button>
             </div>
         </div>
         <LoadingOverlay v-if="isLoading"/>

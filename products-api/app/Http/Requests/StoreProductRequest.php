@@ -32,9 +32,15 @@ class StoreProductRequest extends FormRequest
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    // Allow only <p>, <br>, <b>, and <strong>
-                    if (preg_replace('/<(\/?p|br|b|strong)>/', '', $value) !== strip_tags($value)) {
-                        $fail('A descrição só pode conter as tags <p>, <br>, <b> e <strong>.');
+                    $allowedTags = ['<p>', '</p>', '<br>', '<b>', '</b>', '<strong>', '</strong>'];
+
+                    preg_match_all('/<([^>]+)>/', $value, $matches);
+                    foreach ($matches[1] as $tag) {
+                        $tag = strtolower($tag);
+                        if (!in_array('<' . $tag . '>', $allowedTags) && !in_array('</' . $tag . '>', $allowedTags)) {
+                            $fail('A descrição só pode conter as tags <p>, <br>, <b> e <strong>.');
+                            return;
+                        }
                     }
                 },
             ],

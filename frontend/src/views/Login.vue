@@ -11,7 +11,7 @@ const isLoading = ref(false)
 const error = ref(null)
 const router = useRouter()
 
-async function submit() {
+async function Submit() {
   error.value = null
   isLoading.value = true
 
@@ -24,8 +24,8 @@ async function submit() {
     const endpoint = isRegister.value ? 'register' : 'login'
 
     const body = isRegister.value
-      ? JSON.stringify({ name: name.value, email: email.value, password: password.value }) // Inclui o nome no cadastro
-      : JSON.stringify({ email: email.value, password: password.value }) // Login apenas com email e senha
+      ? JSON.stringify({ name: name.value, email: email.value, password: password.value })
+      : JSON.stringify({ email: email.value, password: password.value })
 
     const res = await fetch(`http://localhost:8000/api/${endpoint}`, {
       method: 'POST',
@@ -44,14 +44,14 @@ async function submit() {
     }
 
     router.push('/')
-  } catch (err) {
-    error.value = 'Network error'
+  } catch {
+    alert('Erro de rede')
   } finally {
     isLoading.value = false
   }
 }
 
-function toggle() {
+function Toggle() {
   isRegister.value = !isRegister.value
   error.value = null
 }
@@ -62,7 +62,7 @@ function toggle() {
   <div class="auth-container">
     <h2>{{ isRegister ? 'Cadastrar' : 'Login' }}</h2>
 
-    <form @submit.prevent="submit">
+    <form @submit.prevent="Submit">
       <div v-if="isRegister">
         <input v-model="name" placeholder="Name" required />
       </div>
@@ -76,7 +76,7 @@ function toggle() {
     <p class="switch">
       <span v-if="!isRegister">Não possui uma conta?</span>
       <span v-else>Já possui uma conta?</span>
-      <button @click="toggle">{{ isRegister ? 'Login' : 'Cadastrar' }}</button>
+      <button @click="Toggle">{{ isRegister ? 'Login' : 'Cadastrar' }}</button>
     </p>
 
     <LoadingOverlay v-if="isLoading"/>

@@ -26,7 +26,7 @@ function ShowModal(product, isNew = false) {
         newProduct.value = true
 }
 
-async function logout() {
+async function Logout() {
 
     await fetch('http://localhost:8000/api/logout', {
         method: 'POST',
@@ -61,7 +61,7 @@ onMounted(async () => {
         
         <div class="div-inner-header">
             <button @click="ShowModal([], true)">Novo produto</button>
-            <button @click="logout()">Sair</button>
+            <button @click="Logout()">Sair</button>
         </div>
 
         <div class="div-list">
@@ -73,7 +73,7 @@ onMounted(async () => {
                 <div class="div-product-info">
                     <h4 class="h4-product-name">{{ product.title }}</h4>
                     <div class="span-product-description">
-                        <span class="line-clamp-2">{{ product.description }}</span>
+                        <span class="line-clamp-2" v-html="product.description"></span>
                     </div>
                     <div class="div-values">
                         <div class="div-left">

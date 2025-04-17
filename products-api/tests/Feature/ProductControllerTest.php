@@ -29,7 +29,8 @@ class ProductControllerTest extends TestCase
             'title' => 'Test Product',
             'description' => 'Test Description',
             'sale_price' => 200,
-            'cost' => 100
+            'cost' => 100,
+            'active' => 1
         ];
 
         // Simulate image file upload (you don't need an actual file for testing)
@@ -79,7 +80,8 @@ class ProductControllerTest extends TestCase
             'title' => 'Test Product',
             'description' => 'Test Description',
             'sale_price' => 200,
-            'cost' => 100
+            'cost' => 100,
+            'active' => 1
         ];
 
         // Make a POST request to store the product with the fake image

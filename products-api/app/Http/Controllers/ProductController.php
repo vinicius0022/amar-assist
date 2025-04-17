@@ -92,7 +92,7 @@ class ProductController extends Controller
             'active' => $validated['active'],
         ]);
 
-        // 🧽 Handle delete images
+        // Handle delete images
         if ($request->has('deleted_images')) {
             foreach ($request->input('deleted_images') as $imgId) {
                 $image = ProductImage::find($imgId);

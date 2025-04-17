@@ -339,6 +339,7 @@ class StoreProductRequestTest extends TestCase
             'description' => 'This is a valid description.',
             'sale_price' => 200,
             'cost' => 100,
+            'active' => 1,
             'images' => [
                 UploadedFile::fake()->image('test.jpg'),
             ],
@@ -363,6 +364,7 @@ class StoreProductRequestTest extends TestCase
             'description' => 'This is a valid description.',
             'sale_price' => 200,
             'cost' => 100,
+            'active' => 1,
             'images' => [
                 UploadedFile::fake()->image('test.png'),
             ],

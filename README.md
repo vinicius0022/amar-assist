@@ -21,7 +21,7 @@ docker-compose up -d
 
 A aplicação será acessível em:
 
-- **Frontend (Vue)**: [http://localhost:5173](http://localhost:5173)
+- **Frontend (Vue)**: [http://localhost:8080](http://localhost:8080)
 - **Backend (Laravel API)**: [http://localhost:8000](http://localhost:8000)
 
 Verifique as portas no seu arquivo `docker-compose.yml` caso use outras.
@@ -33,7 +33,7 @@ Verifique as portas no seu arquivo `docker-compose.yml` caso use outras.
 ### 1. Acessar o container
 
 ```bash
-docker exec -it laravel-app bash
+docker exec -it products-api-app bash
 ```
 
 ### 2. Instalar dependências

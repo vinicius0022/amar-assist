@@ -50,18 +50,6 @@ services:
     networks:
       - app-network
 
-  vue-dev:
-    build:
-      context: .
-      dockerfile: docker/vue/Dockerfile.dev
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "5173:5173"
-    environment:
-      - NODE_ENV=development
-
   vue-prod:
     build:
       context: .
@@ -73,8 +61,6 @@ services:
       - NODE_ENV=production
     networks:
       - app-network
-    depends_on:
-      - vue-dev
 
 volumes:
   mysql_data:

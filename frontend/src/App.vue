@@ -1,16 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 
-const message = ref(null)
-
-
-onMounted(async () => {
-   message.value = await fetch('http://localhost:8000/api/ping')
-      .then((response) => response.json())
-      .then((response) => response.message)
-})
 
 </script>
 

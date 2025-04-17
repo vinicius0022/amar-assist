@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     // Define which fields can be mass-assigned
-    protected $fillable = ['title', 'description', 'sale_price', 'cost'];
+    protected $fillable = ['title', 'description', 'sale_price', 'cost', 'active'];
 
     // Validate sale price and cost
     public static function boot()

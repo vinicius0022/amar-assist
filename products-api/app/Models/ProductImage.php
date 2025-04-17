@@ -22,10 +22,10 @@ class ProductImage extends Model
     /**
      * Store the image and return the file path.
      */
-    public static function storeImage($file)
+    public static function storeImage($file, $i)
     {
         // Generate a unique filename and store the image
-        $filename = time() . '.' . $file->extension();
+        $filename = time() . $i . '.' . $file->extension();
         $filePath = $file->storeAs('public/images', $filename);
         return $filePath;
     }

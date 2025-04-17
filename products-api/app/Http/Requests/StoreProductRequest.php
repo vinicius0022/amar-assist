@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'title' => 'required|string|max:255',
             'sale_price' => 'required|numeric|min:0',
             'cost' => 'required|numeric|min:0',
+            'active' => 'required|boolean',
             'description' => [
                 'required',
                 'string',
@@ -41,6 +42,12 @@ class StoreProductRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'active' => filter_var($this->input('active'), FILTER_VALIDATE_BOOLEAN),
+        ]);
+    }
 
     public function messages(): array
     {

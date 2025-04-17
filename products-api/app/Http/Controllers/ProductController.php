@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreProductRequest;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -41,8 +42,8 @@ class ProductController extends Controller
 
         // Handle images if available
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imagePath = ProductImage::storeImage($image);
+            foreach ($request->file('images') as $i => $image) {
+                $imagePath = ProductImage::storeImage($image, $i);
 
                 ProductImage::create([
                     'product_id' => $product->id,
@@ -74,6 +75,7 @@ class ProductController extends Controller
      */
     public function update(StoreProductRequest $request, $id)
     {
+
         // Find product
         $product = Product::findOrFail($id);
 
@@ -86,12 +88,13 @@ class ProductController extends Controller
             'description' => $validated['description'],
             'sale_price' => $validated['sale_price'],
             'cost' => $validated['cost'],
+            'active' => $validated['active'],
         ]);
 
         // Handle new images if available
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imagePath = ProductImage::storeImage($image);
+            foreach ($request->file('images') as $i => $image) {
+                $imagePath = ProductImage::storeImage($image, $i);
 
                 ProductImage::create([
                     'product_id' => $product->id,

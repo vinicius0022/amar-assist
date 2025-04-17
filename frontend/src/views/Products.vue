@@ -1,87 +1,188 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import useApi from '@/composables/useApi'
+import Product from '@/components/Product.vue'
+import { useAuth } from '@/composables/useAuth'
+import { useRouter } from 'vue-router'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
 
 const products = ref(null)
+const showModal = ref(false)
+const productModal = ref([])
+const newProduct = ref(false)
+const { fetchAll, data, loading } = useApi('api/products')
 
+const defaultNoImage = `http://localhost:8000/images/no-image.jpg`
+
+const { user } = useAuth()
+const router = useRouter()
+
+function ShowModal(product, isNew = false) {
+    showModal.value = !showModal.value
+    productModal.value = product
+
+    newProduct.value = false
+    if(isNew)
+        newProduct.value = true
+}
+
+async function logout() {
+
+    await fetch('http://localhost:8000/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+
+    router.push('/login')
+}
 
 onMounted(async () => {
-   products.value = await fetch('http://localhost:8000/api/products')
-      .then((response) => response.json())
+    await fetchAll()
+    products.value = data.value
 })
+
 </script>
 
 <template>
     <div class="div-page">
-        <div>
-          Products header
+        <h1 class="page-header">
+          Bem-vindo {{ user.name }}
+        </h1>
+        
+        <div class="div-inner-header">
+            <button @click="ShowModal([], true)">Novo produto</button>
+            <button @click="logout()">Sair</button>
         </div>
-      
+
         <div class="div-list">
-            <div class="div-product-card" v-for="product in products">
-                <div class="div-img-carousel">
-                    <img :src="`http://localhost:8000/${product.images[0]?.path.replace('public/', '')}`" />
+            <div class="div-product-card" :class="{inactive: !product.active}" v-for="(product, i) in products" :key="i" @click="ShowModal(product)">
+                <div class="div-img-container">
+                    <img :src="`http://localhost:8000/${product.images[0]?.path.replace('public/', '')}` ?? defaultNoImage" @error="$event.target.src = defaultNoImage"/>
                 </div>
 
                 <div class="div-product-info">
-                    <span class="span-product-name">{{ product.title }}</span>
-                    <span class="span-description line-clamp">{{ product.description }}</span>
+                    <h4 class="h4-product-name">{{ product.title }}</h4>
+                    <div class="span-product-description">
+                        <span class="line-clamp-2">{{ product.description }}</span>
+                    </div>
                     <div class="div-values">
-                        <span>Preço: {{ product.sale_price }}</span>
-                        <span>Custo: {{ product.cost }}</span>
+                        <div class="div-left">
+                            <span>Custo:</span>
+                            <span>{{ product.cost }}</span>
+                        </div>
+                        <div class="div-right">
+                            <span>Preço:</span>
+                            <span>{{ product.sale_price }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-          </div>
-    </div>
+        </div>
+
+        <div v-if="showModal">
+            <Product :product="productModal" @close-modal="showModal = !showModal" :newProduct="newProduct" />
+        </div>
+
+        <LoadingOverlay v-if="loading"/>
+</div>
 </template>
 
 <style scoped>
 
     .div-page {
         width: 100%;
+        color: black;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .div-inner-header {
+        margin-bottom: 20px;
+        text-align: end;
+        display: flex;
+        justify-content: space-between;
     }
 
     .div-list {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 50px;
     }
 
     .div-product-card {
-        height: 250px;
-        width: 250px;
-        border: 2px solid white;
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
+        max-width: 280px;
+        height: 350px;
+        background: white;
+        padding: 1em;
+        box-shadow: 0 5px 5px #e1e1e1;
+        cursor: pointer;
     }
 
-    .div-img-carousel {
+    .div-product-card:hover {
+        background-color: var(--default-app-color);
+        color: white;
+    }
+
+    .inactive {
+        opacity: .5;
+    }
+
+    .div-product-info {
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .div-img-container {
         width: 100%;
-        text-align: center;
+        height: 50%;
+        border: 2px solid var(--default-app-color);
+        background: white;
     }
 
-    .div-img-carousel img {
-        width: 50%;
+    .div-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 
-    .span-product-name {
+    .h4-product-name {
         text-align: center;
         font-weight: 600;
-        display: block;
-        margin: 5px 0px;
-        font-size: 1.1em;
+        margin: .5em 0 0px;
+        font-size: 1.3em;
     }
 
-    .span-description {
-        display: block;
-        height: 40px;
+    .span-product-description {
+        height: 65px;
+        padding-top: 5px;
+        font-size: 1em;
     }
 
     .div-values {
         display: flex;
-        justify-content: space-evenly;
-        margin-top: 10px;
-        font-size: .9em;
+        justify-content: space-between;
+        margin: 10px 0px;
+        font-size: .85em;
+    }
+
+    .div-left,
+    .div-right {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .div-left span:first-of-type {
+        color: orangered;
+    }
+
+    .div-right span:first-of-type {
+        color: green;
     }
 </style>
